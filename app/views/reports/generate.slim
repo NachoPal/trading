@@ -1,0 +1,44 @@
+h1 = @title
+
+table style= "width: 100%;"
+  tr
+    th = 'TIME'
+    th = 'MARKET'
+    th = 'OPEN'
+    th = 'QUANTITY'
+    th = 'BUY'
+    th = 'SELL'
+    th = '%'
+
+  - @transactions.each do |transaction|
+      tr
+        - if !transaction[:open]
+          td
+            b = transaction[:time]
+          td
+            b = transaction[:name]
+          td
+            b = transaction[:open]
+          td
+            b = transaction[:quantity]
+          td
+            b = transaction[:buy]
+          td
+            b = transaction[:sell]
+          td
+            b = transaction[:percentage]
+
+        - else
+          td = transaction[:time]
+          td = transaction[:name]
+          td = transaction[:open]
+          td = transaction[:quantity]
+          td = transaction[:buy]
+          td = transaction[:sell]
+          td = transaction[:percentage]
+
+
+
+
+
+
