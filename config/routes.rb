@@ -4,6 +4,9 @@ Rails.application.routes.draw do
   get 'generated-reports/:id/' => 'reports#generate', as: 'generate_reports', :defaults => { :format => 'pdf' }
   get 'cache/:id/' => 'reports#cache', as: 'cache', :defaults => { :format => 'pdf' }
 
-  post 'run-test/:id' => 'test#run', as: 'run_test'
+  get ':id/new-test/' => 'tests#new', as: 'new_test'
+
+  post ':id/create-test' => 'tests#create', as: 'create_test'
+  #get ':id/create-test' => 'tests#create', as: 'create_test'
 
 end

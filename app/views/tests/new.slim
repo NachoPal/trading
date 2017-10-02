@@ -1,0 +1,28 @@
+ul
+  = form_for @test, url: {action: "create"} do |f|
+    li
+      = 'threshold_of_gain '
+      = f.text_field :threshold_of_gain
+    li
+      = 'threshold_of_lost '
+      = f.text_field :threshold_of_lost
+    li
+      = 'sky_rocket_gain '
+      = f.text_field :sky_rocket_gain
+    li
+      = 'sky_rocket_period_seg '
+      = f.text_field :sky_rocket_period_seg
+    li
+      = 'trend_threshold '
+      = f.text_field :trend_threshold
+    li
+      = 'percentile_volume '
+      = f.text_field :percentile_volume
+    li
+      = 'get_rid_off_after_min '
+      = f.text_field :get_rid_off_after_min
+    li
+      = 'quarantine_to_buy_min '
+      = f.text_field :quarantine_to_buy_min
+    li
+      = f.submit "Create"

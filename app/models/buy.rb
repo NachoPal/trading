@@ -1,0 +1,3 @@
+class Buy < Orderr
+
+end
