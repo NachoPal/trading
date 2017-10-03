@@ -1,5 +1,5 @@
 ul
-  = form_for @test, url: {action: "create"} do |f|
+  = form_for @test, method: 'post' do |f|
     li
       = 'threshold_of_gain '
       = f.text_field :threshold_of_gain

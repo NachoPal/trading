@@ -4,7 +4,12 @@ class ReportsController < ApplicationController
 
     @transactions = []
 
-    Transactionn.all.each do |transaction|
+    transactions = Transactionn.joins(:account).
+                                where(accounts: {id: params[:id]}).all
+
+    @current_benefit = transactions.where.not(percentage: nil).sum(&:percentage)
+
+    transactions.each do |transaction|
 
       buy_price = transaction.buys.first.limit_price
       market_name = transaction.market.name
@@ -26,14 +31,13 @@ class ReportsController < ApplicationController
                         percentage: transaction.percentage.present? ? transaction.percentage : "(#{growth})" }
     end
 
-
     @title = 'REPORT'
 
-    respond_to do |format|
-      format.pdf do
-        render pdf: @title, template: 'reports/generate.slim'
-      end
-    end
+    # respond_to do |format|
+    #   format.pdf do
+    #     render pdf: @title, template: 'reports/generate.slim'
+    #   end
+    # end
   end
 
   def cache
