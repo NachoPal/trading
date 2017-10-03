@@ -1,9 +1,9 @@
 module OrderService
   class PlaceSell
-    def fire!(transaction, buy_order)
+    def fire!(transaction, buy_order, test)
 
       buy_price = buy_order.limit_price
-      sell_price = BigDecimal.new((100 + THRESHOLD_OF_GAIN) * buy_price / 100).floor(8)
+      sell_price = BigDecimal.new((100 + test.threshold_of_gain) * buy_price / 100).floor(8)
 
       sell_order = Orderr::Sell.new(limit_price: sell_price,
                                     quantity: buy_order.quantity,

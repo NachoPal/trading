@@ -34,7 +34,7 @@ namespace :trade do
           sell_order = transaction.sells.where(open: false).last
           has_been_sold(wallet, main_wallet, transaction, buy_order, sell_order)
 
-        elsif MarketService::ShouldBeSold.new.fire!(markets, market_to_sell.name, buy_order)
+        elsif MarketService::ShouldBeSold.new.fire!(markets, market_to_sell.name, buy_order, test)
           Rails.logger.info ".............Should be sold..................\n"
           sell = OrderService::Sell.new.fire!(market_to_sell.name, wallet, buy_order, sell_order)
           Rails.logger.info "Success: #{sell[:success]}"
@@ -45,7 +45,7 @@ namespace :trade do
       else
 
         #------- Buy ---------
-        sky_rocket_market = MarketService::DetectSkyRocket.new.fire!(markets, percentile_volume)
+        sky_rocket_market = MarketService::DetectSkyRocket.new.fire!(markets, percentile_volume, test)
 
         if sky_rocket_market.present?
 
@@ -54,7 +54,7 @@ namespace :trade do
           if bought[:success]
             transaction = bought[:transaction]
             buy_order = bought[:order]
-            OrderService::PlaceSell.new.fire!(transaction, buy_order)
+            OrderService::PlaceSell.new.fire!(transaction, buy_order, test)
           end
         end
       end

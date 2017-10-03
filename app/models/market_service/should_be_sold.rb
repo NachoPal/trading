@@ -1,7 +1,7 @@
 module MarketService
   class ShouldBeSold
 
-    def fire!(markets, market_name, buy_order)
+    def fire!(markets, market_name, buy_order, test)
       #market_info = Bittrex.client.get("public/getmarketsummary?market=#{market_name}").first
       market_info = markets.select { |market| market['MarketName'] == market_name }.first
 
@@ -15,7 +15,7 @@ module MarketService
       Rails.logger.info "Growth: #{growth}"
       Rails.logger.info "Time ago: #{bought_time_ago}"
 
-      growth <= -THRESHOLD_OF_LOST || bought_time_ago > GET_RID_OFF_AFTER_MIN
+      growth <= -test.threshold_of_lost || bought_time_ago > test.get_rid_off_after_min
     end
   end
 end

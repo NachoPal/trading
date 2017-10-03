@@ -1,14 +1,21 @@
 module MarketService
   class DetectSkyRocket
 
-    def fire!(markets, percentile_volume)
+    def fire!(markets, percentile_volume, test)
 
       markets.each do |market|
         begin
           array_prices = CACHE.get(market['MarketName'])
 
+          array_prices_size = array_prices.size - 1
+
+          init_index = array_prices_size - (test.total_monitor_period_min * 60 / test.period_seg)
+          end_index = array_prices_size
+
+          array_prices = array_prices[init_index..end_index]
+
           #steps = SKY_ROCKET_PERIOD_SEG * 60 / PERIOD_SEG
-          steps = SKY_ROCKET_PERIOD_SEG / PERIOD_SEG
+          steps = test.sky_rocket_period_seg / test.period_seg
 
           array_prices.last(steps).delete(nil)
 
@@ -19,10 +26,10 @@ module MarketService
 
           #if growth > SKY_ROCKET_GAIN &&
           if market['BaseVolume'] >= percentile_volume &&
-             good_trend(array_prices) &&
+             good_trend(array_prices, steps, test) &&
              bid_last_assessment(market['Last'], market['Bid'])
 
-            single_growth = single_buyer(array_prices)
+            #single_growth = single_buyer(array_prices, test)
             Rails.logger.info "#{market['MarketName']} - Single Growth: #{single_growth}"
             #unless single_buyer(array_prices)
               return market['MarketName']
@@ -40,13 +47,12 @@ module MarketService
 
     private
 
-    def single_buyer(array_prices)
+    def single_buyer(array_prices, test)
       growth = (array_prices.last * 100 / array_prices.last(2).first) - 100
-      growth > SKY_ROCKET_GAIN
+      growth > test.sky_rocket_gain
     end
 
-    def good_trend(array_prices)
-      step_value = 60 / PERIOD_SEG
+    def good_trend(array_prices, step_value, test)
       trend = []
       previous_max = 0
 
@@ -56,7 +62,7 @@ module MarketService
 
         growth = (sub_array_prices.last * 100 / sub_array_prices.first) - 100
 
-        (growth >= 0.5) && max >= previous_max ? trend << true : trend << false
+        (growth >= test.sky_rocket_gain) && max >= previous_max ? trend << true : trend << false
 
         previous_max = max
       end
@@ -64,7 +70,7 @@ module MarketService
       positive = trend.count(true).to_f
       negative = trend.count(false).to_f
 
-      (negative/positive) * 100 <= TREND_THRESHOLD
+      (negative/positive) * 100 <= test.trend_threshold
     end
 
     def bid_last_assessment(last, bid)
