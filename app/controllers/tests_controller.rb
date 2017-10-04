@@ -3,6 +3,10 @@ Trading::Application.load_tasks
 
 class TestsController < ApplicationController
 
+  def index
+    @accounts = Account.all
+  end
+
   def new
     @test = Test.new
   end

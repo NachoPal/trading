@@ -1,0 +1,47 @@
+table style= "width: 100%;"
+  tr
+    th = 'ACCOUNT'
+    th = 'threshold_gain'
+    th = 'threshold_lost'
+    th = 'sky_rocket_gain'
+    th = 'step_period_seg'
+    th = 'trend_treshold'
+    th = 'percentile_volumen'
+    th = 'get_rid_after_min'
+    th = 'quarentine_to_buy_min'
+    th = '%'
+
+
+  - @accounts.each do |account|
+    - test = account.test
+    - if test.present?
+      - id = account.id
+      - tg = test.threshold_of_gain
+      - th = test.threshold_of_lost
+      - srg = test.sky_rocket_gain
+      - srp = test.sky_rocket_period_seg
+      - tt = test.trend_threshold
+      - pv = test.percentile_volume
+      - gr = test.get_rid_off_after_min
+      - qtb = test.quarantine_to_buy_min
+      - percentage = account.transactionns.where.not(percentage: nil).sum(&:percentage)
+
+
+      tr
+        td
+          = link_to "#{id}", generate_reports_path(account)
+        td = id
+        td = tg
+        td = th
+        td = srg
+        td = srp
+        td = tt
+        td = pv
+        td = gr
+        td = qtb
+        td
+          b = percentage
+
+
+
+
