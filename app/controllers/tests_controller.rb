@@ -8,14 +8,19 @@ class TestsController < ApplicationController
   end
 
   def create
-    @account = Account.find(params[:id])
-    @test = Test.new(test_params)
+    @account = Account.where(id: params[:id])
 
-    if @test.save
+    if @account.present?
+      @account = @account.first
+    else
+      @account = Account.create
+    end
+
+    if @account.test.present?
+      @test = @account.test
       length_array_prices = @test.total_monitor_period_min * 60 / @test.period_seg
 
-      @test.update(length_array_prices: length_array_prices)
-      @account.test = @test
+      @account.test.update(test_params.merge(length_array_prices: length_array_prices))
 
       trade = Rufus::Scheduler.singleton
 
@@ -26,7 +31,24 @@ class TestsController < ApplicationController
 
       redirect_to generate_reports_path(@account.id)
     else
-      render 'new'
+      @test = Test.new(test_params)
+      if @test.save
+        length_array_prices = @test.total_monitor_period_min * 60 / @test.period_seg
+
+        @test.update(length_array_prices: length_array_prices)
+        @account.test = @test
+
+        trade = Rufus::Scheduler.singleton
+
+        trade.every "#{@test.period_seg}s" do
+          Rake::Task['trade:markets'].reenable
+          Rake::Task['trade:markets'].invoke(@test)
+        end
+
+        redirect_to generate_reports_path(@account.id)
+      else
+        render 'new'
+      end
     end
   end
 

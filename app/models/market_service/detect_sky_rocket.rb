@@ -12,7 +12,7 @@ module MarketService
           init_index = array_prices_size - (test.total_monitor_period_min * 60 / test.period_seg)
           end_index = array_prices_size
 
-          array_prices = array_prices[init_index..end_index]
+          array_prices = array_prices[init_index + 1..end_index]
 
           #steps = SKY_ROCKET_PERIOD_SEG * 60 / PERIOD_SEG
           steps = test.sky_rocket_period_seg / test.period_seg
@@ -30,7 +30,7 @@ module MarketService
              bid_last_assessment(market['Last'], market['Bid'])
 
             #single_growth = single_buyer(array_prices, test)
-            Rails.logger.info "#{market['MarketName']} - Single Growth: #{single_growth}"
+            #Rails.logger.info "#{market['MarketName']} - Single Growth: #{single_growth}"
             #unless single_buyer(array_prices)
               return market['MarketName']
             #end
@@ -56,13 +56,17 @@ module MarketService
       trend = []
       previous_max = 0
 
+      Rails.logger.info "Array: #{array_prices}"
+
       (0..array_prices.size - 1).step(step_value).each do |i|
         sub_array_prices = array_prices[i..i + step_value - 1]
+        Rails.logger.info "Sub: #{sub_array_prices}"
+        min = sub_array_prices.min
         max = sub_array_prices.max
 
         growth = (sub_array_prices.last * 100 / sub_array_prices.first) - 100
 
-        (growth >= test.sky_rocket_gain) && max >= previous_max ? trend << true : trend << false
+        (growth >= test.sky_rocket_gain) && min >= previous_max ? trend << true : trend << false
 
         previous_max = max
       end
@@ -70,7 +74,11 @@ module MarketService
       positive = trend.count(true).to_f
       negative = trend.count(false).to_f
 
-      (negative/positive) * 100 <= test.trend_threshold
+      Rails.logger.info "Trend: #{trend}"
+      Rails.logger.info "Positive: #{positive}"
+      Rails.logger.info "Negative: #{negative}"
+
+      (negative/positive) * 100 <= test.trend_threshold.to_f
     end
 
     def bid_last_assessment(last, bid)

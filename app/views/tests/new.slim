@@ -2,34 +2,34 @@ ul
   = form_for @test, method: 'post' do |f|
     li
       = 'threshold_of_gain '
-      = f.text_field :threshold_of_gain
+      = f.text_field :threshold_of_gain, value: 1.5
     li
       = 'threshold_of_lost '
-      = f.text_field :threshold_of_lost
+      = f.text_field :threshold_of_lost, value: 2
     li
       = 'sky_rocket_gain '
-      = f.text_field :sky_rocket_gain
+      = f.text_field :sky_rocket_gain, value: 1
     li
       = 'sky_rocket_period_seg '
-      = f.text_field :sky_rocket_period_seg
+      = f.text_field :sky_rocket_period_seg, value: 60
     li
       = 'trend_threshold '
-      = f.text_field :trend_threshold
+      = f.text_field :trend_threshold, value: 0
     li
       = 'percentile_volume '
-      = f.text_field :percentile_volume
+      = f.text_field :percentile_volume, value: 60
     li
       = 'get_rid_off_after_min '
-      = f.text_field :get_rid_off_after_min
+      = f.text_field :get_rid_off_after_min, value: 10
     li
       = 'total_monitor_period_min '
-      = f.text_field :total_monitor_period_min
+      = f.text_field :total_monitor_period_min, value: 3
     li
       = 'period_seg '
-      = f.text_field :period_seg
+      = f.text_field :period_seg, value: 5
     li
       = 'quarantine_to_buy_min '
-      = f.text_field :quarantine_to_buy_min
+      = f.text_field :quarantine_to_buy_min, value: 5
 
     li
       = f.submit "Create"
