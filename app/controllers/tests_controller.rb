@@ -12,47 +12,31 @@ class TestsController < ApplicationController
   end
 
   def create
-    @account = Account.where(id: params[:id])
 
-    if @account.present?
-      @account = @account.first
-    else
-      @account = Account.create
-    end
+    @test = Test.new(test_params)
 
-    if @account.test.present?
-      @test = @account.test
+    if @test.save
       length_array_prices = @test.total_monitor_period_min * 60 / @test.period_seg
+      @test.update(length_array_prices: length_array_prices)
 
-      @account.test.update(test_params.merge(length_array_prices: length_array_prices))
+      @account = Account.create
+      @account.test = @test
+
+      Wallet.create(account_id: @account.id,
+                    balance: BTC_INITIAL_BALANCE,
+                    available: BTC_INITIAL_BALANCE,
+                    currency_id: Currency.where(name: 'BTC').first.id)
 
       trade = Rufus::Scheduler.singleton
 
       trade.every "#{@test.period_seg}s" do
         Rake::Task['trade:markets'].reenable
-        Rake::Task['trade:markets'].invoke(@test)
+        Rake::Task['trade:markets'].invoke(@test, @account.id)
       end
 
       redirect_to generate_reports_path(@account.id)
     else
-      @test = Test.new(test_params)
-      if @test.save
-        length_array_prices = @test.total_monitor_period_min * 60 / @test.period_seg
-
-        @test.update(length_array_prices: length_array_prices)
-        @account.test = @test
-
-        trade = Rufus::Scheduler.singleton
-
-        trade.every "#{@test.period_seg}s" do
-          Rake::Task['trade:markets'].reenable
-          Rake::Task['trade:markets'].invoke(@test)
-        end
-
-        redirect_to generate_reports_path(@account.id)
-      else
-        render 'new'
-      end
+      render 'new'
     end
   end
 

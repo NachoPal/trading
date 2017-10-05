@@ -26,11 +26,9 @@ table style= "width: 100%;"
       - qtb = test.quarantine_to_buy_min
       - percentage = account.transactionns.where.not(percentage: nil).sum(&:percentage)
 
-
       tr
         td
           = link_to "#{id}", generate_reports_path(account)
-        td = id
         td = tg
         td = th
         td = srg
@@ -41,6 +39,9 @@ table style= "width: 100%;"
         td = qtb
         td
           b = percentage
+
+= link_to "Create new TEST", tests_path
+
 
 
 

@@ -1,7 +1,7 @@
 module OrderService
   class Buy
 
-    def fire!(market_name, main_wallet)
+    def fire!(market_name, main_wallet, account_id)
       Rails.logger.info "Market buy -- #{market_name}"
       market = Market.where(name: market_name).first
 
@@ -14,12 +14,12 @@ module OrderService
 
         if quantity <= ask_order['Quantity']
 
-          bought = buy(market, ask_order['Rate'], quantity)
+          bought = buy(market, ask_order['Rate'], quantity, account_id)
 
           currency = Currency.where(name: market.name.split('-').last).first
 
           #new_wallet = WalletService::Create.new.fire!(currency, quantity, ask_order['Rate'])
-          WalletService::Create.new.fire!(currency, quantity, ask_order['Rate'])
+          WalletService::Create.new.fire!(currency, quantity, ask_order['Rate'], account_id)
 
           return bought #.merge!({wallet: new_wallet}) if bought[:success]
         else
@@ -35,8 +35,8 @@ module OrderService
       Bittrex.client.get("public/getorderbook?market=#{market}&type=sell")
     end
 
-    def buy(market, price, quantity)
-      transaction = TransactionService::Create.new.fire!(market)
+    def buy(market, price, quantity, account_id)
+      transaction = TransactionService::Create.new.fire!(market, account_id)
 
       buy_order = Orderr::Buy.new(limit_price: price,
                                   quantity: quantity,

@@ -1,8 +1,9 @@
 namespace :trade do
 
   desc 'Trade markets'
-  task :markets, [:test] => :environment do |t, args|
+  task :markets, [:test, :account_id] => :environment do |t, args|
     test = args[:test]
+    account_id = args[:account_id]
 
     def has_been_sold(wallet, main_wallet, transaction, buy_order, sell_order)
       TransactionService::Close.new.fire!(transaction, buy_order, sell_order)
@@ -16,8 +17,8 @@ namespace :trade do
       #============= TRADE ===============================
 
       Rails.logger.info "------------------------ Trade ------------------------------"
-      wallets = Wallet.all
-      main_wallet = Wallet.main_wallet
+      wallets = Wallet.where(account_id: account_id)
+      main_wallet = wallets.joins(:currency).where(currencies: {name: BASE_MARKET}).last
 
       wallets = wallets - [main_wallet]
 
@@ -26,7 +27,8 @@ namespace :trade do
         wallet = wallets.last
         market_to_sell = wallet.currency.market
         transaction = market_to_sell.transactionns.joins(:account).
-            where(accounts: {id: 1}).all.last
+                                      where(accounts: {id: account_id}).all.last
+
         sell_order = transaction.sells.last
         buy_order = transaction.buys.last
 
@@ -49,7 +51,7 @@ namespace :trade do
 
         if sky_rocket_market.present?
 
-          bought = OrderService::Buy.new.fire!(sky_rocket_market, main_wallet)
+          bought = OrderService::Buy.new.fire!(sky_rocket_market, main_wallet, account_id)
 
           if bought[:success]
             transaction = bought[:transaction]

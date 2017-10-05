@@ -1,8 +1,8 @@
 module WalletService
   class Create
 
-    def fire!(currency, quantity, rate)
-      new_wallet = Wallet.new(account_id: 1, currency_id: currency.id, balance: quantity,
+    def fire!(currency, quantity, rate, account_id)
+      new_wallet = Wallet.new(account_id: account_id, currency_id: currency.id, balance: quantity,
                               available: quantity, pending: BigDecimal.new(0))
 
       new_wallet.save
