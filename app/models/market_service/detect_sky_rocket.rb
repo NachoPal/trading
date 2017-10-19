@@ -64,9 +64,13 @@ module MarketService
         min = sub_array_prices.min
         max = sub_array_prices.max
 
+        if min == 0 || max == 0
+          return false
+        end
+
         growth = (sub_array_prices.last * 100 / sub_array_prices.first) - 100
 
-        (growth >= test.sky_rocket_gain) && min >= previous_max ? trend << true : trend << false
+        (growth >= test.sky_rocket_gain) && min >= previous_max * 0.5 ? trend << true : trend << false
 
         previous_max = max
       end
