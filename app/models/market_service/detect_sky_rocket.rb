@@ -70,7 +70,7 @@ module MarketService
 
         growth = (sub_array_prices.last * 100 / sub_array_prices.first) - 100
 
-        (growth >= test.sky_rocket_gain) && min >= previous_max * 0.5 ? trend << true : trend << false
+        (growth >= test.sky_rocket_gain) && min >= previous_max * 0.2 ? trend << true : trend << false
 
         previous_max = max
       end
