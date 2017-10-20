@@ -11,24 +11,30 @@ class ReportsController < ApplicationController
 
     transactions.each do |transaction|
 
-      buy_price = transaction.buys.first.limit_price
-      market_name = transaction.market.name
-      current_price = Bittrex.client.get("public/getmarketsummary?market=#{market_name}").first['Last']
+      begin
+        buy_price = transaction.buys.first.limit_price
+        market_name = transaction.market.name
+        current_price = Bittrex.client.get("public/getmarketsummary?market=#{market_name}").first['Last']
 
-      growth = (((current_price * 100) / buy_price) - 100).round(2)
+        growth = (((current_price * 100) / buy_price) - 100).round(2)
 
-      time = transaction.buys.first.created_at.to_time.to_s
-      time.slice!('+0000')
+        time = transaction.buys.first.created_at.to_time.to_s
+        time.slice!('+0000')
 
 
-      @transactions << {time: time,
-                        name: transaction.market.name,
-                        open: transaction.sells.present? ? transaction.sells.first.open : true,
-                        quantity: transaction.buys.first.quantity,
-                        buy: transaction.buys.first.limit_price,
-                        sell: transaction.sells.present? ? transaction.sells.first.limit_price : nil,
-                        benefit: transaction.benefit,
-                        percentage: transaction.percentage.present? ? transaction.percentage : "(#{growth})" }
+        @transactions << {time: time,
+                          name: transaction.market.name,
+                          open: transaction.sells.present? ? transaction.sells.first.open : true,
+                          quantity: transaction.buys.first.quantity,
+                          buy: transaction.buys.first.limit_price,
+                          sell: transaction.sells.present? ? transaction.sells.first.limit_price : nil,
+                          benefit: transaction.benefit,
+                          percentage: transaction.percentage.present? ? transaction.percentage : "(#{growth})" }
+      rescue => e
+        Rails.logger.error "Error: #{e}"
+        Rails.logger.error "Transaction_id: #{transaction.id}"
+        next
+      end
     end
 
     @title = 'REPORT'
